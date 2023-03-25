@@ -1,5 +1,5 @@
 const http = require("http");
-const Room = require("./models/room");
+const Post = require("./models/post");
 const mongoose = require('mongoose');
 const dotenv = require("dotenv");
 
@@ -16,20 +16,19 @@ const requestListener = async (req, res) => {
   req.on("data", chunk => {
     body += chunk;
   });
-  if (req.url === "/rooms" && req.method === "GET") {
-    const rooms = await Room.find(); // get all rooms
+  if (req.url === "/posts" && req.method === "GET") {
+    const posts = await Post.find(); // get all posts
     res.writeHead(200, headers);
     res.write(JSON.stringify({
       "status": "success",
-      rooms,
+      posts,
     }));
     res.end();
-  } else if (req.url === "/rooms" && req.method === "POST") {
+  } else if (req.url === "/posts" && req.method === "POST") {
     req.on("end", async() => {
       try {
         const data = JSON.parse(body);
-        // 第二種新增方式
-        const newRoom = await Room.create({
+        const newPost = await Post.create({
           name: data.name,
           price: data.price,
           rating: data.rating,
@@ -37,7 +36,7 @@ const requestListener = async (req, res) => {
         res.writeHead(200, headers);
         res.write(JSON.stringify({
           "status": "success",
-          rooms: newRoom,
+          posts: newPost,
         }));
         res.end();
       } catch(error) {
@@ -48,17 +47,17 @@ const requestListener = async (req, res) => {
         }));
       }
     })
-  } else if (req.url === "/rooms" && req.method === "DELETE") {
-    const rooms = await Room.deleteMany({});
+  } else if (req.url === "/posts" && req.method === "DELETE") {
+    await Post.deleteMany({});
     res.writeHead(200, headers);
     res.write(JSON.stringify({
       "status": "success",
-      rooms: []
+      posts: []
     }));
     res.end();
-  } else if (req.url.startsWith("/rooms/") && req.method === "DELETE") {
+  } else if (req.url.startsWith("/posts/") && req.method === "DELETE") {
     const id = req.url.split("/").pop();
-    Room.findByIdAndDelete(id).then(() => console.log('deleted successfully'));
+    Post.findByIdAndDelete(id).then(() => console.log('deleted successfully'));
     res.writeHead(200, headers);
     res.write(JSON.stringify({
       "status": "success",
@@ -90,18 +89,3 @@ mongoose.connect(DB)
   .catch((error) => {
     console.log("error");
   });
-
-// 第一種新增方式
-// const testRoom = new Room({
-//   name: "President",
-//   price: 2000,
-//   rating: 4.5,
-// });
-
-// testRoom.save()
-//   .then(() => {
-//     console.log("第一種方式新增資料成功");
-//   })
-//   .catch((error) => {
-//     console.log("error");
-//   });
