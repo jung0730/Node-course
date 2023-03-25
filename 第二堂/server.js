@@ -28,17 +28,20 @@ const requestListener = async (req, res) => {
     req.on("end", async() => {
       try {
         const data = JSON.parse(body);
-        const newPost = await Post.create({
-          name: data.name,
-          price: data.price,
-          rating: data.rating,
-        });
-        res.writeHead(200, headers);
-        res.write(JSON.stringify({
-          "status": "success",
-          posts: newPost,
-        }));
-        res.end();
+        if (data.name && data.content) {
+          const newPost = await Post.create({
+            content: data.content,
+            image: data.image,
+            name: data.name,
+            likes: data.likes
+          });
+          res.writeHead(200, headers);
+          res.write(JSON.stringify({
+            "status": "success",
+            posts: newPost,
+          }));
+          res.end();
+        }
       } catch(error) {
         res.writeHead(400, headers);
         res.write(JSON.stringify({
