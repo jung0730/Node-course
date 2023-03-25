@@ -45,6 +45,7 @@ const requestListener = async (req, res) => {
           "status": "false",
           "message": "欄位不正確",
         }));
+        res.end();
       }
     })
   } else if (req.url === "/posts" && req.method === "DELETE") {
@@ -65,6 +66,7 @@ const requestListener = async (req, res) => {
     res.end();
   } else if (req.method === "OPTIONS") {
     res.writeHead(200, headers);
+    res.end();
   } else {
     res.writeHead(404, headers);
     res.write(JSON.stringify({
