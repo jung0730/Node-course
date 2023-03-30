@@ -1,5 +1,6 @@
 const successHandler = (res, data) => {
-  res.status(200).json({
+  // 預設回200
+  res.json({
     status: 'success',
     data: data,
   });
