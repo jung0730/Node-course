@@ -22,4 +22,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.use('/posts', postsRouter);
+
+// 同步程式出錯
+process.on('uncaughtException', err => {
+  console.error('Uncaught Exception');
+  console.error(err);
+  // 停掉process
+  process.exit(1);
+});
+
+// 非同步程式錯誤(未捕捉到的 catch) 
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('未捕捉到的 rejection：', promise, '原因：', reason);
+})
+
 module.exports = app;
