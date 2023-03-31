@@ -31,6 +31,16 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
+// handle Express middleware errors
+app.use(function(err, req, res, next) {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'error';
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message
+  });
+});
+
 // 非同步程式錯誤(未捕捉到的 catch) 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('未捕捉到的 rejection：', promise, '原因：', reason);
