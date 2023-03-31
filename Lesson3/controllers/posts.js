@@ -48,11 +48,21 @@ const posts = {
       errorHandler(res, err);
     }
   },
-  deletePost(req, res) {
-    
+  async deletePost(req, res) {
+    try {
+      const { id } = req.params;
+      const thePost = await Post.findByIdAndDelete(id);
+      if (thePost) {
+        successHandler(res, thePost);
+      } else {
+        errorHandler(res, 'id 不存在');
+      }
+    } catch(err) {
+      errorHandler(res.err)
+    }
   },
-  deletePosts(req, res) {
-
+  async deletePosts(req, res) {
+    await Post.deleteMany({});
   }
 }
 
