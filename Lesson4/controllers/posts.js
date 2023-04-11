@@ -9,10 +9,10 @@ const posts = {
     //   select: "name photo" // 顯示user 裡的特定欄位
     // });
     const timeSort = req.query.timeSort == "asc" ? "createdAt" : "-createdAt";
-    const q = req.query.q !== undefined ? {"content": new RegExp(req.query.q)} : {};
+    const q = req.query.q !== undefined ? { "content": new RegExp(req.query.q) } : {};
     const postsData = await Post.find(q).populate({
       path: 'user',
-      select: 'name photo '
+      select: 'name photo'
     }).sort(timeSort);
     successHandler(res, postsData);
   },
