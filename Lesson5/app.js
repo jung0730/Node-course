@@ -25,7 +25,8 @@ app.use(cors());
 app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
 
-// 同步程式出錯
+// 錯誤列表，可再拆分
+// 同步程式出錯(還是會掛掉，只是為了找戰犯)
 process.on('uncaughtException', err => {
   console.error('Uncaught Exception');
   console.error(err);
@@ -33,19 +34,24 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-// handle Express middleware errors
-// app.use(function(err, req, res, next) {
-//   err.statusCode = err.statusCode || 500;
-//   err.status = err.status || 'error';
-//   res.status(err.statusCode).json({
-//     status: err.status,
-//     message: err.message
-//   });
-// });
+// 非同步程式錯誤(未捕捉到的 catch) 
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('未捕捉到的 rejection：', promise, '原因：', reason);
+})
 
+// 404
+app.use(function (req, res, next) {
+  res.status(404).send({
+    status: false,
+    message: '該路由不存在',
+  });
+});
+
+// Express middleware errors (可再區分dev 和prod 要回傳的錯誤)
 const resErrorProd = (err, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
+      status: false,
       message: err.message
     })
   } else {
@@ -57,7 +63,12 @@ const resErrorProd = (err, res) => {
 }
 
 const resErrorDev = (err, res) => {
-
+  res.status(err.statusCode).send({
+    status: false,
+    message: err.message,
+    error: err,
+    stack: err.stack,
+  });
 }
 
 app.use(function(err, req, res, next) {
@@ -70,11 +81,6 @@ app.use(function(err, req, res, next) {
     err.isOperational = true;
     resErrorProd(err, res);
   }
-})
-
-// 非同步程式錯誤(未捕捉到的 catch) 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('未捕捉到的 rejection：', promise, '原因：', reason);
 })
 
 module.exports = app;
