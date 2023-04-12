@@ -16,9 +16,9 @@ const posts = {
     }).sort(timeSort);
     successHandler(res, postsData);
   },
-  createPosts(req, res) {
+  async createPosts(req, res) {
     if (req.body.content == undefined){
-      return next(appError(400,"你沒有填寫 content 資料"))
+      return next(errorHandler(400,"你沒有填寫 content 資料"))
     }
     const newPost = await Post.create({
       name: data.name,
@@ -32,40 +32,32 @@ const posts = {
     })
   },
   async patchPost(req, res) {
-    try {
-      const { id } = req.params;
-      const data = req.body;
-      if (!data.content || !data.name) {
-        errorHandler(res, '資料未填寫完成');
-      } else {
-        const editPost = {
-          name: data.name,
-          content: data.content,
-          image: data.image,
-          likes: data.likes
-        }
-        const thePost = await Post.findByIdAndUpdate(id, editPost, { new: true });
-        if (thePost) {
-          successHandler(res, thePost);
-        } else {
-          errorHandler(res, 'id 不存在');
-        }
+    const { id } = req.params;
+    const data = req.body;
+    if (!data.content || !data.name) {
+      return next(errorHandler(400,"資料未填寫完成"))
+    } else {
+      const editPost = {
+        name: data.name,
+        content: data.content,
+        image: data.image,
+        likes: data.likes
       }
-    } catch (err) {
-      errorHandler(res, err);
-    }
-  },
-  async deletePost(req, res) {
-    try {
-      const { id } = req.params;
-      const thePost = await Post.findByIdAndDelete(id);
+      const thePost = await Post.findByIdAndUpdate(id, editPost, { new: true });
       if (thePost) {
         successHandler(res, thePost);
       } else {
-        errorHandler(res, 'id 不存在');
+        return next(errorHandler(400,"id 不存在"))
       }
-    } catch(err) {
-      errorHandler(res.err)
+    }
+  },
+  async deletePost(req, res) {
+    const { id } = req.params;
+    const thePost = await Post.findByIdAndDelete(id);
+    if (thePost) {
+      successHandler(res, thePost);
+    } else {
+      return next(errorHandler(400,"id 不存在"))
     }
   },
   async deletePosts(req, res) {
