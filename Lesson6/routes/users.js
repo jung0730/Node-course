@@ -50,3 +50,47 @@ router.post(
     generateJWT(data, res);
   })
 );
+
+router.post(
+  '/updatePassword',
+  isAuth,
+  asyncErrorHandler(async (req, res, next) => {
+    const { confirmPassword } = req.body;
+    let { password } = req.body;
+    const { _id } = req.user;
+    if (password !== confirmPassword) return next(errorHandler(400,"兩次密碼不一致"));
+    if (!validator.isLength(password, { min: 8 })) {
+      return next(errorHandler(400,"密碼不得低於8字元"));
+    }
+    password = await bcrypt.hash(password, 12);
+    const data = await User.findByIdAndUpdate(_id,{password});
+    // generating a new JWT token can be important for ensuring that the user's credentials remain secure and for re-authenticating the user with the server.
+    generateJWT(data, res);
+  })
+);
+
+router.get(
+  '/profile',
+  isAuth,
+  asyncErrorHandler(async (req, res) => {
+    successHandler(res, { user: req.user });
+  })
+);
+
+router.patch(
+  '/profile',
+  isAuth,
+  asyncErrorHandler(async (req, res, next) => {
+    const { _id } = req.user;
+    const { name, photo, sex } = req.body;
+    if (sex !== 'boy' || sex !== 'girl') {
+      return next(errorHandler(401,"sex 僅可輸入 boy 或 girl"));
+    }
+    const data = await User.findByIdAndUpdate(_id, {
+      name,
+      photo,
+      sex,
+    });
+    successHandler(res, data);
+  })
+);
