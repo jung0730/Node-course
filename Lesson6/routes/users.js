@@ -77,20 +77,20 @@ router.get(
   })
 );
 
-router.patch(
-  '/profile',
-  isAuth,
-  asyncErrorHandler(async (req, res, next) => {
-    const { _id } = req.user;
-    const { name, photo, sex } = req.body;
-    if (sex !== 'boy' || sex !== 'girl') {
-      return next(errorHandler(401,"sex 僅可輸入 boy 或 girl"));
-    }
-    const data = await User.findByIdAndUpdate(_id, {
-      name,
-      photo,
-      sex,
-    });
-    successHandler(res, data);
-  })
-);
+// router.patch(
+//   '/profile',
+//   isAuth,
+//   asyncErrorHandler(async (req, res, next) => {
+//     const { _id } = req.user;
+//     const { name, photo, sex } = req.body;
+//     if (sex !== 'boy' || sex !== 'girl') {
+//       return next(errorHandler(401,"sex 僅可輸入 boy 或 girl"));
+//     }
+//     const data = await User.findByIdAndUpdate(_id, {
+//       name,
+//       photo,
+//       sex,
+//     });
+//     successHandler(res, data);
+//   })
+// );
