@@ -22,6 +22,7 @@ const isAuth = asyncErrorHandler(async (req, res, next) => {
     });
   });
   const currentUser = await User.findById(decoded.id);
+  // 自訂, 帶下去
   req.user = currentUser;
   next();
 });
