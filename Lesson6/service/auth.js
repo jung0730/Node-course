@@ -7,7 +7,7 @@ const asyncErrorHandler = require('../service/asyncErrorHandler');
 const isAuth = asyncErrorHandler(async (req, res, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    token = req.headers.authorization.split('')[1];
+    token = req.headers.authorization.split(' ')[1];
   }
   if (!token) {
     return next(errorHandler(401,"尚未登入"));
